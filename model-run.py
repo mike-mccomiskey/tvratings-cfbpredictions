@@ -12,7 +12,7 @@ from sklearn.metrics import mean_squared_error,r2_score,mean_absolute_percentage
 from sklearn.model_selection import cross_val_score
 from sklearn.experimental import enable_halving_search_cv
 from sklearn.model_selection import HalvingGridSearchCV
-#import pickle
+import pickle
 
 pd.set_option('display.max_rows',1500)
 pd.set_option('display.max_columns',100)
@@ -77,6 +77,8 @@ lookupDf['bins'] = pd.cut(lookupDf['MeanViewers'],bins=bins,labels=labels,includ
 lookupDf['bins'] = lookupDf['bins'].astype('int')
 
 lookupDf['bins'] = lookupDf['bins'].astype('int')
+
+lookupDf.to_csv('lookupdf.csv')
 
 def add_bins(r):
   r.HomeBin = lookupDf[lookupDf['Teams']==r.Home]['bins'].sum()
@@ -199,10 +201,10 @@ Y_pred_gbr_tune = tuned_model_gbr.predict(X_test)
 tuned_model_etr.fit(X,Y)
 tuned_model_gbr.fit(X,Y)
 
-# filename1 = 'tuned_etr.sav'
-# filename2 = 'tuned_gbr.sav'
-# pickle.dump = (tuned_model_etr,open(filename1,'wb'))
-# pickle.dump = (tuned_model_gbr,open(filename2,'wb'))
+filename2 = 'tuned_gbr.sav'
+filename1 = 'tuned_etr.sav'
+pickle.dump(tuned_model_etr,open(filename1,'wb'))
+pickle.dump(tuned_model_gbr,open(filename2,'wb'))
 
 Y_gbr_tuned = tuned_model_gbr.predict(X)
 Y_et_tuned = tuned_model_gbr.predict(X)
