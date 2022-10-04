@@ -51,17 +51,44 @@ df3['HomeDef'] = df3['HomeDef'].replace(0,df3['HomeDef'].mean())
 df3['AwayOff'] = df3['AwayOff'].replace(0,df3['HomeOff'].mean())
 df3['AwayDef'] = df3['AwayDef'].replace(0,df3['AwayDef'].mean())
 
-allTeams = pd.DataFrame(df3['Home'].append(df3['Away'],ignore_index=True),columns=['Teams'])
-uniqueTeams = np.sort(allTeams['Teams'].unique())
+allTeams = pd.concat([df3['Home'],df3['Away']],axis=0,ignore_index=True)
+uniqueTeams = np.sort(allTeams.unique())
+allYears = [2013,2014,2015,2016,2017,2018,2019,2020,2021,2022]
 
-lookupDf = pd.DataFrame(uniqueTeams,columns=['Teams'])
+tempDf = pd.DataFrame(uniqueTeams,columns=['Teams'])
+fullList = [(i,j)
+             for i in tempDf['Teams']
+             for j in allYears]
+
+# print(fullList)
+
+lookupDf = pd.DataFrame(fullList,columns=['Teams','Year'])
 lookupDf['TotalViewers'] = 0
 lookupDf['TotalCount'] = 0
 lookupDf['MeanViewers'] = 0
 
+tempdf1 = pd.read_excel('ratings-final1.xlsx')
+tempdf2 = pd.read_excel('ratings-2021.xlsx')
+fulldf = pd.concat([tempdf1,tempdf2])
+fulldf = fulldf.dropna(subset=['Viewers','HomeOff','HomeDef','AwayOff','AwayDef'])
+fulldf = fulldf[(fulldf['Postseason'] == 0) & (fulldf['Network'].isin(['ABC','FOX','NBC','CBS','ESPN','ESPN2','FS1']))].reset_index(drop=True)
 def summary_row(r):
-  r.TotalViewers = int(df3[df3['Home'] == r.Teams]['Viewers'].sum() + df3[df3['Away'] == r.Teams]['Viewers'].sum())
-  r.TotalCount = df3[df3['Home'] == r.Teams]['Viewers'].count() + df3[df3['Away'] == r.Teams]['Viewers'].count()
+  if (r.Year in [2013,2014,2015,2016]):
+    yearlist = [2013,2014,2015]
+  elif (r.Year == 2017):
+    yearlist = [2014,2015,2016]
+  elif (r.Year == 2018):
+    yearlist = [2015,2016,2017]
+  elif (r.Year == 2019):
+    yearlist = [2016,2017,2018]
+  elif (r.Year == 2020):
+    yearlist = [2017,2018,2019]
+  elif (r.Year == 2021):
+    yearlist = [2018,2019,2020]
+  elif (r.Year == 2022):
+    yearlist = [2019,2020,2021]
+  r.TotalViewers = int(fulldf[(fulldf['Home'] == r.Teams) & (fulldf['Year'].isin(yearlist))]['Viewers'].sum() + fulldf[(fulldf['Away'] == r.Teams) & (fulldf['Year'].isin(yearlist))]['Viewers'].sum())
+  r.TotalCount = fulldf[(fulldf['Home'] == r.Teams) & (fulldf['Year'].isin(yearlist))]['Viewers'].count() + fulldf[(fulldf['Away'] == r.Teams) & (fulldf['Year'].isin(yearlist))]['Viewers'].count()
   if r.TotalCount > 0:
     r.MeanViewers = int(r.TotalViewers / r.TotalCount)
   else:
@@ -69,14 +96,19 @@ def summary_row(r):
   return r
 
 lookupDf = lookupDf.apply(summary_row,axis=1)
-min_value = lookupDf['MeanViewers'].min()
-max_value = lookupDf['MeanViewers'].max()
-bins = np.linspace(min_value,max_value,6)
-labels = [1,2,3,4,5]
-lookupDf['bins'] = pd.cut(lookupDf['MeanViewers'],bins=bins,labels=labels,include_lowest=True)
-lookupDf['bins'] = lookupDf['bins'].astype('int')
+for i in allYears:
+  min_value = lookupDf[lookupDf['Year'] == i]['MeanViewers'].min()
+  max_value = lookupDf[lookupDf['Year'] == i]['MeanViewers'].max()
+  bins = np.linspace(min_value,max_value,6)
+  labels = [1,2,3,4,5]
+  lookupDf.loc[lookupDf['Year'] == i,'bins'] = pd.cut(lookupDf[lookupDf['Year'] == i]['MeanViewers'],bins=bins,labels=labels,include_lowest=True)
+lookupDf['bins'].fillna(1)
+lookupDf.loc[(lookupDf.TotalCount<10)&(lookupDf.bins>3),'bins'] = (lookupDf.bins).astype('int')-1
+print(lookupDf['bins'].value_counts())
+lookupDf['bins'] = lookupDf['bins'].astype('int64')
 
-lookupDf['bins'] = lookupDf['bins'].astype('int')
+
+# lookupDf['bins'] = lookupDf['bins'].astype('int')
 
 lookupDf.to_csv('lookupdf.csv')
 
