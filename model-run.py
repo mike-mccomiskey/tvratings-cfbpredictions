@@ -107,7 +107,6 @@ lookupDf.loc[(lookupDf.TotalCount<10)&(lookupDf.bins>3),'bins'] = (lookupDf.bins
 print(lookupDf['bins'].value_counts())
 lookupDf['bins'] = lookupDf['bins'].astype('int64')
 
-
 # lookupDf['bins'] = lookupDf['bins'].astype('int')
 
 lookupDf.to_csv('lookupdf.csv')
