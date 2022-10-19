@@ -156,6 +156,6 @@ df2022.to_csv('2022withpredictions.csv')
 
 print(df2022[df2022['Viewers']>0][['Dateformat','Time','Network','Home','Away','ViewersK','AddBin','pred','diff','diffpct']])
 
-print(df2022[df2022['Viewers']>0]['diffpct'].mean())
+print(df2022[df2022['Viewers']>0]['diffpct'].median())
 
 print(df2022[df2022['Viewers']==0][['Dateformat','Time','Network','Home','Away','ViewersK','AddBin','pred']])
