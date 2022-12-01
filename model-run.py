@@ -112,8 +112,8 @@ lookupDf['bins'] = lookupDf['bins'].astype('int64')
 lookupDf.to_csv('lookupdf.csv')
 
 def add_bins(r):
-  r.HomeBin = lookupDf[lookupDf['Teams']==r.Home]['bins'].sum()
-  r.AwayBin = lookupDf[lookupDf['Teams']==r.Away]['bins'].sum()
+  r.HomeBin = lookupDf[(lookupDf['Teams']==r.Home)&(lookupDf['Year']==r.Year)]['bins'].sum()
+  r.AwayBin = lookupDf[(lookupDf['Teams']==r.Away)&(lookupDf['Year']==r.Year)]['bins'].sum()
   return r
 
 df3['HomeBin'] = 0

@@ -26,8 +26,8 @@ lookupDf = pd.read_csv('lookupdf.csv')
 # Y_et_tuned = tuned_model_gbr.predict(X)
 
 def add_bins(r):
-  r.HomeBin = lookupDf[lookupDf['Teams']==r.Home]['bins'].sum()
-  r.AwayBin = lookupDf[lookupDf['Teams']==r.Away]['bins'].sum()
+  r.HomeBin = lookupDf[(lookupDf['Teams']==r.Home)&(lookupDf['Year']==r.Year)]['bins'].sum()
+  r.AwayBin = lookupDf[(lookupDf['Teams']==r.Away)&(lookupDf['Year']==r.Year)]['bins'].sum()
   return r
 
 def network_grouping(r):
