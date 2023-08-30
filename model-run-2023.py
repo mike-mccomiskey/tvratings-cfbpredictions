@@ -218,9 +218,9 @@ model_etr = ExtraTreesRegressor()
 model_etr.fit(X_train,Y_train)
 Y_pred_et = model_etr.predict(X_test)
 
-model_xgb = xgb.XGBRegressor(objective="req:squarederror",random_state=36)
-model_xgb.fit(X_train,Y_train)
-Y_pred_xgb = model_xgb.predict(X_test)
+# model_xgb = xgb.XGBRegressor(objective="req:squarederror",random_state=36)
+# model_xgb.fit(X_train,Y_train)
+# Y_pred_xgb = model_xgb.predict(X_test)
 
 # model_lgbm = LGBMRegressor()
 # model_lgbm.fit(X_train,Y_train)

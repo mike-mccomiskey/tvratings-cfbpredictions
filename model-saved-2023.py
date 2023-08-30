@@ -16,8 +16,8 @@ import pickle
 pd.set_option('display.max_rows',1500)
 pd.set_option('display.max_columns',100)
 
-filename2 = 'tuned_gbr.sav'
-filename1 = 'tuned_etr.sav'
+filename2 = 'tuned_gbr_2023.sav'
+filename1 = 'tuned_etr_2023.sav'
 tuned_model_etr = (pickle.load(open(filename1,'rb')))
 tuned_model_gbr = (pickle.load(open(filename2,'rb')))
 
@@ -125,37 +125,37 @@ def process_dataset_1(dfnew):
   dfnew['LatePrime'] = np.where((dfnew['Hour']>=21),1,0)
   return dfnew
 
-df2022 = pd.read_excel('ratings-2022.xlsx')
+df2023 = pd.read_excel('ratings-2023.xlsx')
 
-df2022 = df2022[df2022['Network'].isin(['ABC','CBS','NBC','FOX','ESPN','ESPN2','FS1'])]
-df2022['HomeGames'] = df2022['HomeWins']+df2022['HomeLosses']
-df2022['AwayGames'] = df2022['AwayWins']+df2022['AwayLosses']
-df2022['RecDifferentials'] = (df2022['HomeWins'] - df2022['HomeLosses']) + (df2022['AwayWins'] - df2022['AwayLosses'])
-df2022 = process_dataset_1(df2022)
+df2023 = df2023[df2023['Network'].isin(['ABC','CBS','NBC','FOX','ESPN','ESPN2','FS1'])]
+df2023['HomeGames'] = df2023['HomeWins']+df2023['HomeLosses']
+df2023['AwayGames'] = df2023['AwayWins']+df2023['AwayLosses']
+df2023['RecDifferentials'] = (df2023['HomeWins'] - df2023['HomeLosses']) + (df2023['AwayWins'] - df2023['AwayLosses'])
+df2023 = process_dataset_1(df2023)
 
-windowDf = pd.DataFrame(np.sort(df2022['Dateformat'].unique()),columns=['Date'])
+windowDf = pd.DataFrame(np.sort(df2023['Dateformat'].unique()),columns=['Date'])
 windowDf[['EarlyAfternoon1','EarlyAfternoon2','EarlyAfternoon3','LateAfternoon1','LateAfternoon2','LateAfternoon3','PrimeTime1','PrimeTime2','PrimeTime3','LatePrime1','LatePrime2','LatePrime3']] = [0,0,0,0,0,0,0,0,0,0,0,0]
-windowDf = windowDf.apply(collect_windows2,args=(df2022,),axis=1)
-df2022[['Window_A_Games','Window_B_Games','Window_C_Games']] = [0,0,0]
-df2022 = df2022.apply(game_competition,axis=1)
-df2022['Games_In_Window'] = df2022['Window_A_Games'] + df2022['Window_B_Games'] + df2022['Window_C_Games']
+windowDf = windowDf.apply(collect_windows2,args=(df2023,),axis=1)
+df2023[['Window_A_Games','Window_B_Games','Window_C_Games']] = [0,0,0]
+df2023 = df2023.apply(game_competition,axis=1)
+df2023['Games_In_Window'] = df2023['Window_A_Games'] + df2023['Window_B_Games'] + df2023['Window_C_Games']
 
-XCols = df2022.drop(labels=['Line','OULine','HomeGames','AwayGames','Dateformat','Home','Away','Time','Year','Viewers','ViewersK','Network','HomeConf','AwayConf','MultBin','Home Rank','Away Rank','Hour','HomePred','AwayPred','OUPred','Postseason','Real date'],axis=1).keys()
+XCols = df2023.drop(labels=['Line','OULine','HomeGames','AwayGames','Dateformat','Home','Away','Time','Year','Viewers','ViewersK','Network','HomeConf','AwayConf','MultBin','Home Rank','Away Rank','Hour','HomePred','AwayPred','OUPred','Postseason','Real date'],axis=1).keys()
 
-X4=df2022[XCols]
-Y4=df2022['ViewersK']
+X4=df2023[XCols]
+Y4=df2023['ViewersK']
 
-y2022_pred_gbr = tuned_model_gbr.predict(X4)
-y2022_pred_etr = tuned_model_etr.predict(X4)
-df2022['pred'] = (y2022_pred_gbr + y2022_pred_etr) / 2
-df2022['pred'] = round(df2022['pred'],1)
-df2022['diff'] = round(df2022['ViewersK'] - df2022['pred'],0)
-df2022['diffpct'] = (abs(df2022['diff'] / df2022['pred'])*100).astype('int')
+y2023_pred_gbr = tuned_model_gbr.predict(X4)
+y2023_pred_etr = tuned_model_etr.predict(X4)
+df2023['pred'] = (y2023_pred_gbr + y2023_pred_etr) / 2
+df2023['pred'] = round(df2023['pred'],1)
+df2023['diff'] = round(df2023['ViewersK'] - df2023['pred'],0)
+df2023['diffpct'] = (abs(df2023['diff'] / df2023['pred'])*100).astype('int')
 
-df2022.to_csv('2022withpredictions.csv')
+df2023.to_csv('2023withpredictions.csv')
 
-print(df2022[df2022['Viewers']>0][['Dateformat','Time','Network','Home','Away','ViewersK','AddBin','pred','diff','diffpct']])
+print(df2023[df2023['Viewers']>0][['Dateformat','Time','Network','Home','Away','ViewersK','AddBin','pred','diff','diffpct']])
 
-print(df2022[df2022['Viewers']>0]['diffpct'].median())
+print(df2023[df2023['Viewers']>0]['diffpct'].median())
 
-print(df2022[df2022['Viewers']==0][['Dateformat','Time','Network','Home','Away','ViewersK','AddBin','pred']])
+print(df2023[df2023['Viewers']==0][['Dateformat','Time','Network','Home','Away','ViewersK','AddBin','pred']])
