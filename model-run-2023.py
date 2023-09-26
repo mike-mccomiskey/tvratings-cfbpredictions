@@ -54,7 +54,7 @@ df3['AwayDef'] = df3['AwayDef'].replace(0,df3['AwayDef'].mean())
 
 allTeams = pd.concat([df3['Home'],df3['Away']],axis=0,ignore_index=True)
 uniqueTeams = np.sort(allTeams.unique())
-allYears = [2013,2014,2015,2016,2017,2018,2019,2020,2021,2022]
+allYears = [2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023]
 
 tempDf = pd.DataFrame(uniqueTeams,columns=['Teams'])
 fullList = [(i,j)
@@ -88,6 +88,8 @@ def summary_row(r):
     yearlist = [2018,2019,2020]
   elif (r.Year == 2022):
     yearlist = [2019,2020,2021]
+  elif (r.Year == 2023):
+    yearlist = [2020,2021,2022]
   r.TotalViewers = int(fulldf[(fulldf['Home'] == r.Teams) & (fulldf['Year'].isin(yearlist))]['Viewers'].sum() + fulldf[(fulldf['Away'] == r.Teams) & (fulldf['Year'].isin(yearlist))]['Viewers'].sum())
   r.TotalCount = fulldf[(fulldf['Home'] == r.Teams) & (fulldf['Year'].isin(yearlist))]['Viewers'].count() + fulldf[(fulldf['Away'] == r.Teams) & (fulldf['Year'].isin(yearlist))]['Viewers'].count()
   if r.TotalCount > 0:
